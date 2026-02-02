@@ -7,15 +7,25 @@ import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
-  const supabase = createClient();
-  
+  const [supabase, setSupabase] = useState<any>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize on mount
+  React.useEffect(() => {
+    setSupabase(createClient());
+  }, []);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!supabase) {
+      setError('Initializing...');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -55,7 +65,7 @@ export default function LoginPage() {
                 placeholder="operator@example.com"
                 className="w-full bg-slate-700 border border-gray-600 rounded px-4 py-2 text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none transition"
                 required
-                disabled={loading}
+                disabled={loading || !supabase}
               />
             </div>
 
@@ -68,7 +78,7 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 className="w-full bg-slate-700 border border-gray-600 rounded px-4 py-2 text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none transition"
                 required
-                disabled={loading}
+                disabled={loading || !supabase}
               />
             </div>
 
@@ -80,10 +90,10 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading || !email || !password}
-              className="w-full btn-primary py-3 mt-6"
+              disabled={loading || !email || !password || !supabase}
+              className="w-full px-4 py-3 rounded font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition disabled:bg-gray-600 disabled:cursor-not-allowed mt-6"
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {!supabase ? 'Loading...' : loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
 
