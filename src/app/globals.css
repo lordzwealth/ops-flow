@@ -1,0 +1,88 @@
+/* src/app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Industrial aesthetic */
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-slate-950 text-gray-100 antialiased;
+  }
+
+  /* Monospace font */
+  body {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+  }
+}
+
+/* Custom components */
+@layer components {
+  /* Integrity badge */
+  .integrity-badge {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded text-xs font-bold bg-green-900 text-green-300 border border-green-600;
+  }
+
+  .integrity-badge.breach {
+    @apply bg-red-900 text-red-300 border-red-600;
+  }
+
+  /* Task card */
+  .task-card {
+    @apply rounded-lg p-6 border-l-4 border-cyan-500 bg-slate-800 shadow-lg hover:shadow-xl transition;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    @apply px-4 py-2 rounded font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition disabled:bg-gray-600 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 rounded font-bold bg-slate-700 hover:bg-slate-600 text-white transition;
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    @apply bg-slate-700 animate-pulse rounded;
+  }
+
+  /* Micro-interaction: glow on focus */
+  .focus-glow:focus {
+    @apply outline-none ring-2 ring-cyan-500 ring-offset-2 ring-offset-slate-900;
+  }
+
+  /* Code-like styling */
+  .code-text {
+    @apply font-mono text-sm bg-slate-950 p-2 rounded border border-gray-700;
+  }
+}
+
+/* Utility: TAT status colors */
+.tat-ok {
+  @apply text-green-400;
+}
+
+.tat-warning {
+  @apply text-yellow-400;
+}
+
+.tat-breach {
+  @apply text-red-400 font-bold;
+}
+
+/* Lock badge animation */
+@keyframes lock-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.lock-badge {
+  animation: lock-pulse 1s ease-in-out infinite;
+}
