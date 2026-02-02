@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, Loader } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -47,78 +47,103 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-cyan-400 mb-2">OpsFlow</h1>
-          <p className="text-gray-400 text-sm">• Routine Task Excellence</p>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-2xl">
+              <span className="text-4xl font-bold text-white">O</span>
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold gradient-text mb-2">OpsFlow</h1>
+          <p className="text-slate-500 text-sm tracking-wide uppercase">Operational Excellence Platform</p>
         </div>
 
-        <div className="bg-slate-800 rounded-lg border border-cyan-500 p-8 shadow-2xl">
-          <h2 className="text-2xl font-bold text-white mb-6">Login</h2>
-
-          <form onSubmit={handleLogin} className="space-y-4">
+        {/* Login Card */}
+        <div className="glass-card p-8 mb-6">
+          <form onSubmit={handleLogin} className="space-y-5">
+            {/* Email Field */}
             <div>
-              <label className="block text-sm text-gray-300 mb-2">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="john.doe@example.com"
-                className="w-full bg-slate-700 border border-gray-600 rounded px-4 py-2 text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none transition"
-                required
-                disabled={loading || !supabase}
-              />
+              <label className="block text-sm font-600 text-slate-700 mb-3">Corporate Email</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="operator@company.com"
+                  className="input-glass pl-12"
+                  required
+                  disabled={loading || !supabase}
+                />
+              </div>
             </div>
 
+            {/* Password Field */}
             <div>
-              <label className="block text-sm text-gray-300 mb-2">Password</label>
+              <label className="block text-sm font-600 text-slate-700 mb-3">Secure Password</label>
               <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-slate-700 border border-gray-600 rounded px-4 py-2 text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none transition"
+                  className="input-glass pl-12 pr-12"
                   required
                   disabled={loading || !supabase}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-cyan-400 transition"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
                   disabled={loading || !supabase}
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
 
+            {/* Error Message */}
             {error && (
-              <div className="p-3 rounded bg-red-900 border border-red-600 text-red-300 text-sm">
+              <div className="p-4 rounded-2xl bg-red-100/60 backdrop-blur border border-red-200/40 text-red-700 text-sm font-500">
                 {error}
               </div>
             )}
 
+            {/* Login Button */}
             <button
               type="submit"
               disabled={loading || !email || !password || !supabase}
-              className="w-full px-4 py-3 rounded font-bold bg-cyan-600 hover:bg-cyan-500 text-white transition disabled:bg-gray-600 disabled:cursor-not-allowed mt-6"
+              className="btn-primary w-full flex items-center justify-center gap-2 mt-6"
             >
-              {!supabase ? 'Loading...' : loading ? 'Logging in...' : 'Login'}
+              {!supabase || loading ? (
+                <>
+                  <Loader size={18} className="animate-spin" />
+                  {loading ? 'Securing...' : 'Loading...'}
+                </>
+              ) : (
+                'SECURE LOGIN'
+              )}
             </button>
           </form>
 
-          <p className="text-gray-400 text-sm mt-6 text-center">
-            Don't have an account?{' '}
-            <Link href="/register" className="text-cyan-400 hover:text-cyan-300 font-semibold">
+          {/* Divider */}
+          <div className="divider-glass my-6"></div>
+
+          {/* Register Link */}
+          <p className="text-center text-sm text-slate-600">
+            Need unit access?{' '}
+            <Link href="/register" className="font-600 text-blue-600 hover:text-blue-700 transition-colors">
               Register here
             </Link>
           </p>
         </div>
 
-        <p className="text-gray-500 text-xs text-center mt-8">
-          © 2026 OpsFlow. All Routinal Tasks Logged & Audited.
+        {/* Footer */}
+        <p className="text-center text-xs text-slate-500">
+          © 2026 OpsFlow. All operations logged & audited.
         </p>
       </div>
     </div>
