@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 
 @layer base {
   * {
@@ -16,12 +16,16 @@
 
   body {
     @apply bg-gradient-to-br from-blue-50 via-white to-blue-100 text-slate-900;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold tracking-tight;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
   }
 
   /* Remove default button styling */
@@ -206,7 +210,8 @@
 
   .section-title {
     @apply text-3xl font-bold text-slate-900;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
   }
 
   .section-subtitle {
@@ -247,17 +252,20 @@
 
   .text-xl-title {
     @apply text-2xl font-bold text-slate-900;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
   }
 
   .text-lg-title {
     @apply text-xl font-bold text-slate-900;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
   }
 
   .text-md-title {
     @apply text-lg font-semibold text-slate-900;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 600;
   }
 
   .text-muted {
