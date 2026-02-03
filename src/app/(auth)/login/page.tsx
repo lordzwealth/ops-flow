@@ -76,7 +76,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="operator@company.com"
+                  placeholder="john.doe@company.com"
                   className="input pl-12"
                   required
                   disabled={loading || !supabase}
@@ -151,7 +151,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="text-center text-slate-500 text-xs">
-          © 2026 OpsFlow. All operations logged & audited.
+          © 2026 OpsFlow. All Operational Routine Logged & Audited.
         </p>
       </div>
     </div>
