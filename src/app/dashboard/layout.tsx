@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { LogOut, Menu, X, Settings, BarChart3, ClipboardList, Home } from 'lucide-react';
+import { LogOut, Menu, X, Settings, BarChart3, Zap, User } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -59,48 +59,46 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <div className="w-12 h-12 rounded-full border-3 border-white border-t-transparent animate-spin"></div>
-          </div>
-          <p className="text-slate-600 font-500">Loading...</p>
+          <div className="w-16 h-16 rounded-full border-4 border-slate-700 border-t-cyan-500 mx-auto mb-4 spinner" />
+          <p className="text-slate-400 font-semibold">Loading...</p>
         </div>
       </div>
     );
   }
 
   const navItems = [
-    { icon: Home, label: 'Shift Hub', href: '/dashboard/shift-hub', always: true },
+    { icon: Zap, label: 'Shift Hub', href: '/dashboard/shift-hub', always: true },
     { icon: Settings, label: 'Admin Panel', href: '/dashboard/admin-panel', admin: true },
     { icon: BarChart3, label: 'Audit Ledger', href: '/dashboard/audit-ledger', always: true },
   ];
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+    <div className="flex min-h-screen bg-slate-950">
       {/* Sidebar */}
       <aside
         className={`${
           sidebarOpen ? 'w-72' : 'w-24'
-        } sidebar-glass transition-all duration-300 flex flex-col`}
+        } sidebar-base transition-all duration-300 flex flex-col`}
       >
         {/* Logo */}
-        <div className="p-6 border-b border-white/20">
-          <Link href="/dashboard/shift-hub" className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg flex-shrink-0">
-              <span className="text-xl font-bold text-white">O</span>
+        <div className="p-6 border-b border-slate-800">
+          <Link href="/dashboard/shift-hub" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-600 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/30">
+              <Zap className="text-slate-950 w-6 h-6" />
             </div>
             {sidebarOpen && (
               <div>
-                <h1 className="font-bold text-slate-900">OpsFlow</h1>
-                <p className="text-xs text-slate-500">Excellence</p>
+                <h1 className="font-bold text-slate-100">OpsFlow</h1>
+                <p className="text-xs text-slate-500">Operators</p>
               </div>
             )}
           </Link>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
             if (item.admin && userProfile?.role !== 'admin' && userProfile?.role !== 'super_admin') {
               return null;
@@ -111,61 +109,69 @@ export default function DashboardLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center gap-4 px-4 py-3 rounded-2xl text-slate-700 hover:bg-white/30 hover:text-slate-900 transition-all duration-200 group"
+                className="nav-item group"
               >
-                <Icon size={20} className="text-blue-600 group-hover:text-blue-700" />
-                {sidebarOpen && <span className="font-500">{item.label}</span>}
+                <Icon className="w-5 h-5 flex-shrink-0 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                {sidebarOpen && <span>{item.label}</span>}
               </Link>
             );
           })}
         </nav>
 
-        {/* User Profile */}
-        {sidebarOpen && (
-          <div className="p-4 border-t border-white/20 space-y-4">
-            <div className="glass-card p-4">
-              <p className="text-xs text-slate-500 font-600 mb-2 uppercase tracking-wide">Operator</p>
-              <p className="font-700 text-slate-900 truncate">{userProfile?.full_name}</p>
-              <p className="text-sm text-slate-600 mt-1">{userProfile?.department}</p>
-              <div className="mt-3 inline-block">
-                <span className="px-3 py-1 rounded-full text-xs font-600 bg-blue-100/60 text-blue-700">
-                  {userProfile?.role}
-                </span>
+        {/* User Profile Section */}
+        {sidebarOpen && userProfile && (
+          <div className="p-4 border-t border-slate-800 space-y-4">
+            <div className="card bg-slate-800/50">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-lg bg-cyan-600/20 flex items-center justify-center">
+                  <User className="w-5 h-5 text-cyan-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-slate-100 text-sm truncate">
+                    {userProfile.full_name}
+                  </p>
+                  <p className="text-xs text-slate-400 truncate">{userProfile.department}</p>
+                </div>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <span className="badge-info text-xs">{userProfile.role}</span>
               </div>
             </div>
 
             <button
               onClick={handleLogout}
-              className="btn-danger w-full flex items-center justify-center gap-2"
+              className="btn btn-danger w-full flex items-center justify-center gap-2"
             >
-              <LogOut size={16} />
+              <LogOut className="w-4 h-4" />
               Logout
             </button>
           </div>
         )}
 
         {/* Toggle Button */}
-        <div className="p-4 border-t border-white/20">
+        <div className="p-4 border-t border-slate-800">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="w-full flex justify-center p-3 rounded-2xl hover:bg-white/30 transition-colors text-slate-700 hover:text-slate-900"
+            className="w-full flex justify-center p-2 rounded-xl hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-200"
           >
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col bg-gradient-to-br from-slate-950 via-slate-950 to-slate-900">
         {/* Header */}
-        <div className="header-glass p-6 border-b border-white/20">
-          <h2 className="text-3xl font-bold gradient-text">Dashboard</h2>
-          <p className="text-sm text-slate-500 mt-1">{new Date().toLocaleString()}</p>
+        <div className="header-base p-6 border-b border-slate-800">
+          <h2 className="text-3xl font-bold text-brand">Dashboard</h2>
+          <p className="text-slate-400 text-sm mt-1">{new Date().toLocaleString()}</p>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-auto p-6">
-          {children}
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </div>
       </main>
     </div>
