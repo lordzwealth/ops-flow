@@ -74,16 +74,18 @@ export default function DashboardLayout({
     { icon: BarChart3, label: 'Audit Ledger', href: '/dashboard/audit-ledger', always: true },
   ];
 
+  const isAdmin = userProfile?.role === 'admin' || userProfile?.role === 'super_admin';
+
   return (
     <div className="flex min-h-screen bg-slate-950">
       {/* Sidebar */}
       <aside
         className={`${
           sidebarOpen ? 'w-72' : 'w-24'
-        } sidebar-base transition-all duration-300 flex flex-col`}
+        } sidebar-base transition-all duration-300 flex flex-col overflow-hidden`}
       >
         {/* Logo */}
-        <div className="p-6 border-b border-slate-800">
+        <div className="p-6 border-b border-slate-800 flex-shrink-0">
           <Link href="/dashboard/shift-hub" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-600 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/30">
               <Zap className="text-slate-950 w-6 h-6" />
@@ -100,7 +102,7 @@ export default function DashboardLayout({
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
-            if (item.admin && userProfile?.role !== 'admin' && userProfile?.role !== 'super_admin') {
+            if (item.admin && !isAdmin) {
               return null;
             }
 
@@ -118,55 +120,57 @@ export default function DashboardLayout({
           })}
         </nav>
 
-        {/* User Profile Section - ALWAYS VISIBLE */}
-        {userProfile && (
-          <div className="p-4 border-t border-slate-800 space-y-3">
-            {sidebarOpen ? (
-              <>
-                <div className="card bg-slate-800/50">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-cyan-600/20 flex items-center justify-center flex-shrink-0">
-                        <User className="w-5 h-5 text-cyan-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-slate-100 text-sm truncate">
-                          {userProfile.full_name}
-                        </p>
-                        <p className="text-xs text-slate-400 truncate">{userProfile.department}</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2 flex-wrap pt-2">
-                      <span className={`badge ${userProfile.role === 'super_admin' ? 'badge-danger' : 'badge-info'}`}>
-                        {userProfile.role === 'super_admin' ? '👑 Super Admin' : userProfile.role}
-                      </span>
-                    </div>
+        {/* User Profile Card */}
+        <div className="p-4 border-t border-slate-800 flex-shrink-0">
+          {sidebarOpen ? (
+            <>
+              <div className="card bg-slate-800/50 mb-3">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-lg bg-cyan-600/20 flex items-center justify-center flex-shrink-0">
+                    <User className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-slate-100 text-sm truncate">
+                      {userProfile?.full_name || 'User'}
+                    </p>
+                    <p className="text-xs text-slate-400 truncate">{userProfile?.department || 'N/A'}</p>
                   </div>
                 </div>
+                
+                {userProfile?.role && (
+                  <div className="pt-2 border-t border-slate-700">
+                    <span className={`badge ${
+                      userProfile.role === 'super_admin' 
+                        ? 'bg-red-600/20 text-red-400 border-red-600/50' 
+                        : 'badge-info'
+                    }`}>
+                      {userProfile.role === 'super_admin' ? '👑 Super Admin' : userProfile.role}
+                    </span>
+                  </div>
+                )}
+              </div>
 
-                <button
-                  onClick={handleLogout}
-                  className="btn btn-danger w-full flex items-center justify-center gap-2"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </button>
-              </>
-            ) : (
-              /* Collapsed sidebar - show icon logout button */
               <button
                 onClick={handleLogout}
-                className="btn btn-danger w-full flex items-center justify-center gap-2 py-2"
-                title="Logout"
+                className="btn btn-danger w-full flex items-center justify-center gap-2 text-sm"
               >
                 <LogOut className="w-4 h-4" />
+                Logout
               </button>
-            )}
-          </div>
-        )}
+            </>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className="btn btn-danger w-full flex items-center justify-center p-2 rounded-xl"
+              title="Logout"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+          )}
+        </div>
 
-        {/* Toggle Button */}
-        <div className="p-4 border-t border-slate-800">
+        {/* Sidebar Toggle */}
+        <div className="p-4 border-t border-slate-800 flex-shrink-0">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="w-full flex justify-center p-2 rounded-xl hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-200"
