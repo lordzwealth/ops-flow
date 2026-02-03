@@ -127,7 +127,7 @@ export default function DashboardLayout({
             </div>
             {sidebarOpen && (
               <div>
-                <h1 className="font-bold text-slate-900" style={{ fontFamily: 'Space Grotesk' }}>OpsFlow</h1>
+                <h1 className="font-bold text-slate-900">OpsFlow</h1>
                 <p className="text-xs text-slate-500">Operations</p>
               </div>
             )}
@@ -219,7 +219,7 @@ export default function DashboardLayout({
       <main className="flex-1 flex flex-col">
         {/* Header */}
         <div className="header p-8 border-b border-blue-100">
-          <h2 className="text-4xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Space Grotesk' }}>Dashboard</h2>
+          <h2 className="text-4xl font-bold text-slate-900 mb-2">Dashboard</h2>
           <p className="text-slate-600 text-sm">{new Date().toLocaleString()}</p>
         </div>
 
