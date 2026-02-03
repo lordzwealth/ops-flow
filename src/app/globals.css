@@ -205,7 +205,8 @@
   }
 
   .section-title {
-    @apply text-3xl font-bold text-slate-900 space-grotesk;
+    @apply text-3xl font-bold text-slate-900;
+    font-family: 'Space Grotesk', sans-serif;
   }
 
   .section-subtitle {
