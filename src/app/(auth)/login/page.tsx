@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { Eye, EyeOff, Lock, Mail, Loader2, Zap } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -47,20 +47,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/10 via-transparent to-blue-900/10" />
-
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo & Branding */}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-600 to-cyan-500 flex items-center justify-center shadow-2xl shadow-cyan-500/50">
-              <Zap className="text-slate-950" size={32} />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-200/50">
+              <span className="text-3xl font-bold text-white">O</span>
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-brand mb-2">OpsFlow</h1>
-          <p className="text-slate-400 text-sm tracking-widest uppercase">Operational Excellence</p>
+          <h1 className="text-4xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Space Grotesk' }}>
+            OpsFlow
+          </h1>
+          <p className="text-slate-600 text-sm tracking-wide uppercase">Operational Excellence Platform</p>
         </div>
 
         {/* Login Card */}
@@ -70,7 +69,7 @@ export default function LoginPage() {
             <div>
               <label htmlFor="email" className="input-label">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                 <input
                   id="email"
                   type="email"
@@ -88,7 +87,7 @@ export default function LoginPage() {
             <div>
               <label htmlFor="password" className="input-label">Password</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -102,7 +101,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
                   disabled={loading || !supabase}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -112,7 +111,7 @@ export default function LoginPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="p-4 rounded-xl bg-red-600/10 border border-red-600/30 text-red-400 text-sm font-medium">
+              <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium">
                 {error}
               </div>
             )}
@@ -121,7 +120,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || !email || !password || !supabase}
-              className="btn-primary w-full flex items-center justify-center gap-2 py-4 text-base"
+              className="btn-primary w-full py-4 text-base group"
             >
               {!supabase || loading ? (
                 <>
@@ -130,8 +129,8 @@ export default function LoginPage() {
                 </>
               ) : (
                 <>
-                  <Lock className="w-5 h-5" />
                   Sign In
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1" />
                 </>
               )}
             </button>
@@ -141,9 +140,9 @@ export default function LoginPage() {
           <div className="divider my-6" />
 
           {/* Register Link */}
-          <p className="text-center text-slate-400 text-sm">
+          <p className="text-center text-slate-600 text-sm">
             Need an account?{' '}
-            <Link href="/register" className="text-brand font-semibold hover:text-cyan-300 transition-colors">
+            <Link href="/register" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">
               Register here
             </Link>
           </p>
@@ -151,7 +150,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="text-center text-slate-500 text-xs">
-          © 2026 OpsFlow. All Operational Routine Logged & Audited.
+          © 2026 OpsFlow. All Routine Tasks Logged & Audited.
         </p>
       </div>
     </div>
