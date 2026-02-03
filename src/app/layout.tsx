@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'OpsFlow | Operational Excellence',
-  description: 'Real-time routine execution & forensic audit platform',
+  description: 'Real-time routine execution',
 };
 
 export const viewport: Viewport = {
