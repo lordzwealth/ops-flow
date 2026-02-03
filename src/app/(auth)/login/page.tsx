@@ -56,7 +56,7 @@ export default function LoginPage() {
               <span className="text-3xl font-bold text-white">O</span>
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Space Grotesk' }}>
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">
             OpsFlow
           </h1>
           <p className="text-slate-600 text-sm tracking-wide uppercase">Operational Excellence Platform</p>
@@ -75,7 +75,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="john.doe@company.com"
+                  placeholder="operator@company.com"
                   className="input pl-12"
                   required
                   disabled={loading || !supabase}
@@ -150,7 +150,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="text-center text-slate-500 text-xs">
-          © 2026 OpsFlow. All Routine Tasks Logged & Audited.
+          © 2026 OpsFlow. All operations logged & audited.
         </p>
       </div>
     </div>
