@@ -19,31 +19,51 @@ export default function DashboardLayout({
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        setError(null);
+        
+        // Get authenticated user
+        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
 
-        if (!user) {
+        if (authError || !authUser) {
+          console.error('Auth error:', authError);
           router.push('/login');
           return;
         }
 
-        setUser(user);
+        setUser(authUser);
+        console.log('Auth user:', authUser.id, authUser.email);
         
-        const { data: profile, error } = await supabase
+        // Fetch user profile from public.users table
+        const { data: profile, error: profileError } = await supabase
           .from('users')
           .select('*')
-          .eq('id', user.id)
+          .eq('id', authUser.id)
           .single();
 
-        if (!error && profile) {
-          setUserProfile(profile);
+        if (profileError) {
+          console.error('Profile fetch error:', profileError);
+          setError(`Profile error: ${profileError.message}`);
+          // Don't redirect, just show the error
+          return;
         }
-      } catch (error) {
-        console.error('Auth error:', error);
-        router.push('/login');
+
+        if (!profile) {
+          console.error('No profile found for user:', authUser.id);
+          setError('No profile found. Please register properly.');
+          return;
+        }
+
+        console.log('Profile loaded:', profile);
+        setUserProfile(profile);
+        
+      } catch (error: any) {
+        console.error('Unexpected auth error:', error);
+        setError(error.message);
       } finally {
         setLoading(false);
       }
@@ -53,8 +73,12 @@ export default function DashboardLayout({
   }, [router, supabase]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/login');
+    try {
+      await supabase.auth.signOut();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   if (loading) {
@@ -122,50 +146,62 @@ export default function DashboardLayout({
 
         {/* User Profile Card */}
         <div className="p-4 border-t border-slate-800 flex-shrink-0">
-          {sidebarOpen ? (
-            <>
-              <div className="card bg-slate-800/50 mb-3">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-cyan-600/20 flex items-center justify-center flex-shrink-0">
-                    <User className="w-5 h-5 text-cyan-400" />
+          {error ? (
+            <div className="card bg-red-900/20 border-red-600/30 text-red-400 text-xs p-3">
+              {error}
+            </div>
+          ) : userProfile ? (
+            sidebarOpen ? (
+              <>
+                <div className="card bg-slate-800/50 mb-3">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-cyan-600/20 flex items-center justify-center flex-shrink-0">
+                      <User className="w-5 h-5 text-cyan-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-slate-100 text-sm truncate">
+                        {userProfile.full_name || 'User'}
+                      </p>
+                      <p className="text-xs text-slate-400 truncate">
+                        {userProfile.department || 'No Department'}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-slate-100 text-sm truncate">
-                      {userProfile?.full_name || 'User'}
-                    </p>
-                    <p className="text-xs text-slate-400 truncate">{userProfile?.department || 'N/A'}</p>
-                  </div>
+                  
+                  {userProfile.role && (
+                    <div className="pt-2 border-t border-slate-700">
+                      <span className={`badge ${
+                        userProfile.role === 'super_admin' 
+                          ? 'bg-red-600/20 text-red-400 border-red-600/50' 
+                          : 'badge-info'
+                      }`}>
+                        {userProfile.role === 'super_admin' ? '👑 Super Admin' : userProfile.role}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                
-                {userProfile?.role && (
-                  <div className="pt-2 border-t border-slate-700">
-                    <span className={`badge ${
-                      userProfile.role === 'super_admin' 
-                        ? 'bg-red-600/20 text-red-400 border-red-600/50' 
-                        : 'badge-info'
-                    }`}>
-                      {userProfile.role === 'super_admin' ? '👑 Super Admin' : userProfile.role}
-                    </span>
-                  </div>
-                )}
-              </div>
 
+                <button
+                  onClick={handleLogout}
+                  className="btn btn-danger w-full flex items-center justify-center gap-2 text-sm"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              </>
+            ) : (
               <button
                 onClick={handleLogout}
-                className="btn btn-danger w-full flex items-center justify-center gap-2 text-sm"
+                className="btn btn-danger w-full flex items-center justify-center p-2 rounded-xl"
+                title="Logout"
               >
-                <LogOut className="w-4 h-4" />
-                Logout
+                <LogOut className="w-5 h-5" />
               </button>
-            </>
+            )
           ) : (
-            <button
-              onClick={handleLogout}
-              className="btn btn-danger w-full flex items-center justify-center p-2 rounded-xl"
-              title="Logout"
-            >
-              <LogOut className="w-5 h-5" />
-            </button>
+            <div className="text-slate-400 text-xs text-center py-2">
+              Loading profile...
+            </div>
           )}
         </div>
 
