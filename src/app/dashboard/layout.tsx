@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { LogOut, Menu, X, Settings, BarChart3, Zap, User } from 'lucide-react';
+import { LogOut, Menu, X, Settings, BarChart3, Zap, User, ChevronDown } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -19,6 +19,7 @@ export default function DashboardLayout({
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -120,21 +121,25 @@ export default function DashboardLayout({
 
         {/* User Profile Section */}
         {sidebarOpen && userProfile && (
-          <div className="p-4 border-t border-slate-800 space-y-4">
+          <div className="p-4 border-t border-slate-800 space-y-3">
             <div className="card bg-slate-800/50">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-lg bg-cyan-600/20 flex items-center justify-center">
-                  <User className="w-5 h-5 text-cyan-400" />
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-cyan-600/20 flex items-center justify-center flex-shrink-0">
+                    <User className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-slate-100 text-sm truncate">
+                      {userProfile.full_name}
+                    </p>
+                    <p className="text-xs text-slate-400 truncate">{userProfile.department}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-slate-100 text-sm truncate">
-                    {userProfile.full_name}
-                  </p>
-                  <p className="text-xs text-slate-400 truncate">{userProfile.department}</p>
+                <div className="flex gap-2 flex-wrap pt-2">
+                  <span className={`badge ${userProfile.role === 'super_admin' ? 'badge-danger' : 'badge-info'}`}>
+                    {userProfile.role === 'super_admin' ? '👑 Super Admin' : userProfile.role}
+                  </span>
                 </div>
-              </div>
-              <div className="flex gap-2 flex-wrap">
-                <span className="badge-info text-xs">{userProfile.role}</span>
               </div>
             </div>
 
@@ -161,10 +166,43 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col bg-gradient-to-br from-slate-950 via-slate-950 to-slate-900">
-        {/* Header */}
-        <div className="header-base p-6 border-b border-slate-800">
-          <h2 className="text-3xl font-bold text-brand">Dashboard</h2>
-          <p className="text-slate-400 text-sm mt-1">{new Date().toLocaleString()}</p>
+        {/* Header with Mobile Logout */}
+        <div className="header-base p-6 border-b border-slate-800 flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-brand">Dashboard</h2>
+            <p className="text-slate-400 text-sm mt-1">{new Date().toLocaleString()}</p>
+          </div>
+          
+          {/* Mobile User Menu */}
+          {!sidebarOpen && (
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
+              >
+                <ChevronDown className="w-5 h-5 text-slate-400" />
+              </button>
+              
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-48 card shadow-2xl z-50">
+                  <div className="space-y-3">
+                    <div className="pb-3 border-b border-slate-700">
+                      <p className="font-semibold text-slate-100 text-sm">{userProfile?.full_name}</p>
+                      <p className="text-xs text-slate-400">{userProfile?.department}</p>
+                      <p className="text-xs text-cyan-400 mt-1">{userProfile?.role}</p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="btn btn-danger w-full flex items-center justify-center gap-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Content */}
