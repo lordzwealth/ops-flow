@@ -1,9 +1,9 @@
-// src/app/(dashboard)/shift-hub/page.tsx
+// src/app/dashboard/shift-hub/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Lock, AlertCircle, CheckCircle } from 'lucide-react';
+import { Lock, AlertCircle, CheckCircle, Loader2, Zap } from 'lucide-react';
 
 export default function ShiftHubPage() {
   const supabase = createClient();
@@ -26,7 +26,6 @@ export default function ShiftHubPage() {
 
       if (!user) return;
 
-      // Get user profile to get department
       const { data: profile } = await supabase
         .from('users')
         .select('department')
@@ -35,7 +34,6 @@ export default function ShiftHubPage() {
 
       if (!profile) return;
 
-      // Fetch tasks for today
       const today = new Date().toISOString().split('T')[0];
       const { data: taskData, error } = await supabase
         .from('task_instances')
@@ -76,7 +74,6 @@ export default function ShiftHubPage() {
         (lockedTime.getTime() - scheduledTime.getTime()) / 60000
       );
 
-      // Get routine to check TAT SLA
       const { data: routine } = await supabase
         .from('routines')
         .select('tat_minutes')
@@ -85,7 +82,6 @@ export default function ShiftHubPage() {
 
       const tatBreached = routine && tatMinutes > routine.tat_minutes;
 
-      // Update task
       const { error } = await supabase
         .from('task_instances')
         .update({
@@ -100,7 +96,6 @@ export default function ShiftHubPage() {
         .eq('id', selectedTask.id);
 
       if (!error) {
-        // Log to audit ledger
         await supabase.from('audit_ledger').insert([
           {
             task_id: selectedTask.id,
@@ -130,10 +125,10 @@ export default function ShiftHubPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-cyan-400 mx-auto mb-4"></div>
-          <p>Loading tasks...</p>
+          <Loader2 className="w-12 h-12 text-cyan-500 mx-auto mb-4 animate-spin" />
+          <p className="text-slate-400">Loading tasks...</p>
         </div>
       </div>
     );
@@ -141,152 +136,200 @@ export default function ShiftHubPage() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-cyan-400 mb-2">Shift Hub</h1>
-        <p className="text-gray-400">Execute and lock operational routines</p>
+        <div className="flex items-center gap-3 mb-2">
+          <Zap className="w-6 h-6 text-brand" />
+          <h1 className="text-3xl font-bold text-brand">Shift Hub</h1>
+        </div>
+        <p className="text-slate-400">Execute and lock operational routines</p>
       </div>
 
       {tasks.length === 0 ? (
-        <div className="bg-slate-800 border border-gray-700 rounded-lg p-8 text-center">
-          <p className="text-gray-400">No tasks scheduled for today</p>
+        <div className="card p-12 text-center">
+          <p className="text-slate-400">No tasks scheduled for today</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Task List */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-white">Tasks</h2>
-            {tasks.map((task) => (
-              <div
-                key={task.id}
-                onClick={() => setSelectedTask(task)}
-                className={`p-4 rounded-lg border-l-4 cursor-pointer transition ${
-                  task.status === 'Locked'
-                    ? 'bg-green-900 border-green-500'
-                    : task.tat_breached
-                    ? 'bg-red-900 border-red-500'
-                    : 'bg-slate-800 border-cyan-500 hover:bg-slate-700'
-                } ${selectedTask?.id === task.id ? 'ring-2 ring-cyan-400' : ''}`}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-bold text-cyan-300">{task.id}</h3>
-                    <p className="text-xs text-gray-400">
-                      {new Date(task.scheduled_time).toLocaleTimeString()}
-                    </p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Tasks List */}
+          <div className="lg:col-span-1 space-y-4">
+            <h2 className="text-lg font-semibold text-slate-100">Tasks</h2>
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {tasks.map((task) => (
+                <button
+                  key={task.id}
+                  onClick={() => setSelectedTask(task)}
+                  className={`w-full text-left card transition-all ${
+                    selectedTask?.id === task.id
+                      ? 'border-cyan-500 ring-1 ring-cyan-500/50 bg-slate-800'
+                      : 'hover:border-slate-700'
+                  } ${
+                    task.status === 'Locked'
+                      ? 'border-emerald-600/30 bg-emerald-600/5'
+                      : task.tat_breached
+                      ? 'border-red-600/30 bg-red-600/5'
+                      : 'border-slate-700'
+                  }`}
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="font-semibold text-slate-100">{task.id}</h3>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {new Date(task.scheduled_time).toLocaleTimeString()}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      {task.status === 'Locked' && (
+                        <CheckCircle className="w-4 h-4 text-emerald-400" />
+                      )}
+                      {task.tat_breached && (
+                        <AlertCircle className="w-4 h-4 text-red-400" />
+                      )}
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    {task.status === 'Locked' && <CheckCircle size={20} className="text-green-400" />}
-                    {task.tat_breached && <AlertCircle size={20} className="text-red-400" />}
-                  </div>
-                </div>
 
-                {task.status === 'Locked' && (
-                  <div className="text-xs text-gray-300 mt-2 p-2 bg-slate-900 rounded">
-                    <p className="font-bold">🔒 LOCKED & IMMUTABLE</p>
-                    <p className="mt-1">{task.commentary}</p>
+                  {task.status === 'Locked' && (
+                    <div className="mt-3 pt-3 border-t border-slate-700">
+                      <p className="badge-success text-xs">LOCKED</p>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Task Detail Form */}
+          <div className="lg:col-span-2">
+            {selectedTask ? (
+              <div className="card-lg">
+                <h2 className="text-xl font-bold text-brand mb-6 flex items-center gap-2">
+                  <Lock className="w-5 h-5" />
+                  Lock Task
+                </h2>
+
+                {selectedTask.status === 'Locked' ? (
+                  <div className="bg-emerald-600/10 border border-emerald-600/30 rounded-xl p-6">
+                    <p className="text-emerald-400 font-semibold mb-3 flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      This task is locked and immutable
+                    </p>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xs text-slate-500 mb-1 uppercase tracking-wider">Commentary</p>
+                        <p className="text-slate-300">{selectedTask.commentary}</p>
+                      </div>
+                      {selectedTask.evidence && JSON.parse(selectedTask.evidence).length > 0 && (
+                        <div>
+                          <p className="text-xs text-slate-500 mb-2 uppercase tracking-wider">Evidence</p>
+                          <div className="space-y-2">
+                            {JSON.parse(selectedTask.evidence).map((link: string, i: number) => (
+                              <a
+                                key={i}
+                                href={link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 text-sm truncate"
+                              >
+                                📎 {link.slice(0, 50)}...
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Commentary */}
+                    <div>
+                      <label className="input-label">Commentary *</label>
+                      <textarea
+                        value={commentary}
+                        onChange={(e) => setCommentary(e.target.value)}
+                        placeholder="Describe what happened during this task..."
+                        className="input resize-none h-32"
+                      />
+                      <p className="input-helper">This will be locked forever once submitted</p>
+                    </div>
+
+                    {/* Evidence */}
+                    <div>
+                      <label className="input-label">Evidence Links</label>
+                      <div className="flex gap-2 mb-3">
+                        <input
+                          type="url"
+                          value={newEvidence}
+                          onChange={(e) => setNewEvidence(e.target.value)}
+                          placeholder="Paste Google Drive or Cloud Storage link..."
+                          className="input flex-1"
+                        />
+                        <button
+                          onClick={() => {
+                            if (newEvidence) {
+                              setEvidence([...evidence, newEvidence]);
+                              setNewEvidence('');
+                            }
+                          }}
+                          className="btn btn-secondary btn-sm"
+                        >
+                          Add
+                        </button>
+                      </div>
+
+                      {evidence.length > 0 && (
+                        <div className="space-y-2">
+                          {evidence.map((link, i) => (
+                            <div
+                              key={i}
+                              className="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg text-sm"
+                            >
+                              <a
+                                href={link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-cyan-400 hover:text-cyan-300 truncate flex-1"
+                              >
+                                📎 {link.slice(0, 40)}...
+                              </a>
+                              <button
+                                onClick={() => setEvidence(evidence.filter((_, idx) => idx !== i))}
+                                className="text-red-400 hover:text-red-300 ml-2"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Submit Button */}
+                    <button
+                      onClick={handleLockTask}
+                      disabled={locking || !commentary.trim()}
+                      className="btn-primary w-full flex items-center justify-center gap-2 py-4"
+                    >
+                      {locking ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Locking...
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-5 h-5" />
+                          Lock & Commit
+                        </>
+                      )}
+                    </button>
                   </div>
                 )}
               </div>
-            ))}
+            ) : (
+              <div className="card-lg flex items-center justify-center min-h-96">
+                <p className="text-slate-400 text-center">Select a task to lock</p>
+              </div>
+            )}
           </div>
-
-          {/* Task Detail */}
-          {selectedTask ? (
-            <div className="bg-slate-800 border border-cyan-500 rounded-lg p-6">
-              <h2 className="text-xl font-bold text-cyan-400 mb-4">Lock Task</h2>
-
-              {selectedTask.status === 'Locked' ? (
-                <div className="bg-green-900 border border-green-600 p-4 rounded">
-                  <p className="text-green-300 font-bold mb-2">🔒 This task is locked</p>
-                  <p className="text-sm text-gray-300">{selectedTask.commentary}</p>
-                  {selectedTask.evidence && JSON.parse(selectedTask.evidence).length > 0 && (
-                    <div className="mt-3">
-                      <p className="text-xs text-gray-400 mb-2">Evidence:</p>
-                      {JSON.parse(selectedTask.evidence).map((link: string, i: number) => (
-                        <a
-                          key={i}
-                          href={link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-cyan-400 text-sm underline block"
-                        >
-                          📎 {link.slice(0, 50)}...
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm text-gray-300 mb-2">Shift Commentary *</label>
-                    <textarea
-                      value={commentary}
-                      onChange={(e) => setCommentary(e.target.value)}
-                      placeholder="What happened during this task? Be precise."
-                      className="w-full bg-slate-700 border border-gray-600 rounded px-4 py-2 text-white text-sm focus:border-cyan-500 focus:outline-none resize-none"
-                      rows={4}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm text-gray-300 mb-2">Evidence Links</label>
-                    <div className="flex gap-2 mb-2">
-                      <input
-                        type="url"
-                        value={newEvidence}
-                        onChange={(e) => setNewEvidence(e.target.value)}
-                        placeholder="Paste Google Drive or Cloud Storage link..."
-                        className="flex-1 bg-slate-700 border border-gray-600 rounded px-4 py-2 text-white text-sm focus:border-cyan-500 focus:outline-none"
-                      />
-                      <button
-                        onClick={() => {
-                          if (newEvidence) {
-                            setEvidence([...evidence, newEvidence]);
-                            setNewEvidence('');
-                          }
-                        }}
-                        className="px-4 py-2 rounded bg-cyan-600 hover:bg-cyan-500 text-white text-sm"
-                      >
-                        Add
-                      </button>
-                    </div>
-
-                    {evidence.length > 0 && (
-                      <div className="space-y-1">
-                        {evidence.map((link, i) => (
-                          <div key={i} className="flex justify-between items-center bg-slate-700 p-2 rounded text-xs">
-                            <a href={link} target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline truncate">
-                              📎 {link.slice(0, 40)}...
-                            </a>
-                            <button
-                              onClick={() => setEvidence(evidence.filter((_, idx) => idx !== i))}
-                              className="text-red-400 hover:text-red-300"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    onClick={handleLockTask}
-                    disabled={locking || !commentary.trim()}
-                    className="w-full py-2 rounded font-bold bg-cyan-600 hover:bg-cyan-500 disabled:bg-gray-600 text-white transition flex items-center justify-center gap-2"
-                  >
-                    <Lock size={18} />
-                    {locking ? 'Locking...' : 'Lock & Commit'}
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="bg-slate-800 border border-gray-700 rounded-lg p-6 flex items-center justify-center h-full min-h-96">
-              <p className="text-gray-400">Select a task to lock</p>
-            </div>
-          )}
         </div>
       )}
     </div>
