@@ -288,20 +288,8 @@
      SHADOWS
      ============================================================================ */
 
-  .shadow-sm {
-    @apply shadow-sm;
-  }
-
-  .shadow-md {
-    @apply shadow-md;
-  }
-
-  .shadow-lg {
-    @apply shadow-lg;
-  }
-
   .shadow-blue {
-    @apply shadow-lg shadow-blue-200/50;
+    box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
   }
 
   /* ============================================================================
