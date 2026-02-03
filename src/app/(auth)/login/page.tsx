@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { Eye, EyeOff, Lock, Mail, Loader } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, Loader2, Zap } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -47,33 +47,37 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Background Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/10 via-transparent to-blue-900/10" />
+
+      <div className="w-full max-w-md relative z-10">
+        {/* Logo & Branding */}
+        <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-2xl">
-              <span className="text-4xl font-bold text-white">O</span>
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-600 to-cyan-500 flex items-center justify-center shadow-2xl shadow-cyan-500/50">
+              <Zap className="text-slate-950" size={32} />
             </div>
           </div>
-          <h1 className="text-4xl font-bold gradient-text mb-2">OpsFlow</h1>
-          <p className="text-slate-500 text-sm tracking-wide uppercase">Operational Excellence Platform</p>
+          <h1 className="text-4xl font-bold text-brand mb-2">OpsFlow</h1>
+          <p className="text-slate-400 text-sm tracking-widest uppercase">Operational Excellence</p>
         </div>
 
         {/* Login Card */}
-        <div className="glass-card p-8 mb-6">
-          <form onSubmit={handleLogin} className="space-y-5">
+        <div className="card-lg mb-8">
+          <form onSubmit={handleLogin} className="space-y-6">
             {/* Email Field */}
             <div>
-              <label className="block text-sm font-600 text-slate-700 mb-3">Corporate Email</label>
+              <label htmlFor="email" className="input-label">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
                 <input
+                  id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="operator@company.com"
-                  className="input-glass pl-12"
+                  className="input pl-12"
                   required
                   disabled={loading || !supabase}
                 />
@@ -82,67 +86,71 @@ export default function LoginPage() {
 
             {/* Password Field */}
             <div>
-              <label className="block text-sm font-600 text-slate-700 mb-3">Secure Password</label>
+              <label htmlFor="password" className="input-label">Password</label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
                 <input
+                  id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="input-glass pl-12 pr-12"
+                  className="input pl-12 pr-12"
                   required
                   disabled={loading || !supabase}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
                   disabled={loading || !supabase}
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="p-4 rounded-2xl bg-red-100/60 backdrop-blur border border-red-200/40 text-red-700 text-sm font-500">
+              <div className="p-4 rounded-xl bg-red-600/10 border border-red-600/30 text-red-400 text-sm font-medium">
                 {error}
               </div>
             )}
 
-            {/* Login Button */}
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading || !email || !password || !supabase}
-              className="btn-primary w-full flex items-center justify-center gap-2 mt-6"
+              className="btn-primary w-full flex items-center justify-center gap-2 py-4 text-base"
             >
               {!supabase || loading ? (
                 <>
-                  <Loader size={18} className="animate-spin" />
-                  {loading ? 'Securing...' : 'Loading...'}
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  {loading ? 'Signing in...' : 'Loading...'}
                 </>
               ) : (
-                'SECURE LOGIN'
+                <>
+                  <Lock className="w-5 h-5" />
+                  Sign In
+                </>
               )}
             </button>
           </form>
 
           {/* Divider */}
-          <div className="divider-glass my-6"></div>
+          <div className="divider my-6" />
 
           {/* Register Link */}
-          <p className="text-center text-sm text-slate-600">
-            Need unit access?{' '}
-            <Link href="/register" className="font-600 text-blue-600 hover:text-blue-700 transition-colors">
+          <p className="text-center text-slate-400 text-sm">
+            Need an account?{' '}
+            <Link href="/register" className="text-brand font-semibold hover:text-cyan-300 transition-colors">
               Register here
             </Link>
           </p>
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-slate-500">
+        <p className="text-center text-slate-500 text-xs">
           © 2026 OpsFlow. All operations logged & audited.
         </p>
       </div>
